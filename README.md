@@ -1,4 +1,4 @@
-##Vehicle Car Detection
+## Vehicle Car Detection
 
 ---
 
@@ -12,25 +12,25 @@ The goals / steps of this project are the following:
 * Estimate a bounding box for vehicles detected.
 
 ---
-###The training dataset
+### The training dataset
 These example images come from a combination of the GTI vehicle image database, the KITTI vision benchmark suite, and examples extracted from the project video itself. 
 
 The training dataset consists of 6941 cars and 8968 non-car images in .png format.
 Here are a few examples:
 ![Dataset](output_images/datasamples.jpg)
 
-###Feature Extraction 
+### Feature Extraction 
 The idea is to extract features that represents a custom profile of colors and shapes of each image.
 Color related features are extracted by color histograms that show the distribution of colors and the intensity.
 Shape related features are extraced with the HOG - "Histogram of Oriented Gradients" method.
 
-####Spatially binned features
+#### Spatially binned features
 With this method the image is reduced to e.g (32,32) pixel format and all pixels are converted in one feature-vector of length 32 x 32 x 3 = 3072 features ( x pixel \* y pixel  \* 3 colors).
 
 ![spatially_binned_features](output_images/spatially_binned_features.jpg)
 
 
-####Color Histrograms
+#### Color Histrograms
 With this method we generate a profile of the intensitiy of the 3 color channels and concatenate them.
 The idea behind is that cars are more colorful than the road or environment.
 
@@ -41,7 +41,7 @@ def color_hist(img, nbins=32, bins_range=(0, 256)):
 ```
 ![colour_histogram_features](output_images/colour_histogram_features.jpg)
 
-####Histogram of Oriented Gradients (HOG)
+#### Histogram of Oriented Gradients (HOG)
 
 To get a fingerprint of the objects's shape we use the Histogram of Oriented Gradients (HOG). It shows the gradients and their direction.
 
@@ -77,7 +77,7 @@ Here is an example using the `YCrCb` color space and HOG parameters of `orientat
 
 ![HOG Example](output_images/hogsample.jpg)
 
-####Combining feature extraction methods
+#### Combining feature extraction methods
 In the pipeline all feature extraction methods are combined. 
 ![normalized features](output_images/extract_features.jpg)
 
@@ -85,7 +85,7 @@ Because the intensity is different, it has to be normalized.
 ![normalized features](output_images/extract_features_normalized.jpg)
 
 
-####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
+#### Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
 I trained a linear SVM by first extracting the features with the function call `extract_features_from_dataset()` for all car and non-car images are extracted ( HOG, color, sapitalliy binned).
 Next I used the `create_traindataset()` function to split the into training and test data.
@@ -118,7 +118,7 @@ accuracy = round(svc.score(X_test, y_test), 4)
 and got an accuracy of 98.5%.
 
 
-###Sliding Window Search
+### Sliding Window Search
 
 The sliding window search is implemented in the function
 
@@ -141,30 +141,31 @@ I used the following windows and scaling factors:
 With these parameters I got the following result:  
 ![Windows](output_images/searchwindows.jpg)
 
-###Pipeline
+### Pipeline
 
 The pipeline for image processing consists of the following steps:
-####1. Find cars
+
+#### 1. Find cars
 With this fucntion call
 ```python 
-rectangles.append(find_cars(img, ystart, ystop, scale, svc, X_scaler, 
+rectangles.append(find_cars(img, ystart, ystop, scale, svc, X_scaler,  
                                orient, pix_per_cell, cell_per_block, spatial_size, hist_bins))
 ```
 we search for the cars. Before the sliding window search is applied, the features of the processed window part are extracted.
                                
 ![pipeline_findcars](output_images/pipeline_findcars.jpg)
 
-####2. Heatmap
+#### 2. Heatmap
 Next we generate a heatmap by counting the pixels wihtin overlapping windows.
 `heatmap_img = add_heat(heatmap_img, rectangles)`
 ![pipeline_heatmap](output_images/pipeline_heatmap.jpg)
 
-####3. Heatmap threshold
+#### 3. Heatmap threshold
 To prevent false positives we define a threshold to ignore weak signals.
 ` heatmap_img = apply_threshold(heatmap_img, heat_threshold)`
 ![pipeline_heatmap_threshold](output_images/pipeline_heatmap_threshold.jpg)
 
-####3. Labeled boxes
+#### 4. Labeled boxes
 Finally the founded cars are labeled and all boxes are combined into one box using the max x and y values fo the single boxes.
 ```python
     labels = label(heatmap_img)    
@@ -192,14 +193,14 @@ To smoothen the detected boxes, the position of the boxes in the last `30` frame
 
 ---
 
-###Discussion
+### Discussion
 
-####Tweaking Parameters:
+#### Tweaking Parameters:
 Much time was needed to find out the right parameters. Not only for feature extraction but also for getting a heatmap threshold to find a balance between false positives and no detection.
 
 The pipeline will detect also cars in oncoming traffic. To prevent this, the window search could use a left margin to spare out cars that are too far left.
 
-###Performance Issues:
+### Performance Issues:
 The car finding takes too long for a real time application. It took around 1 h to calculate a video of 50 seconds.
 Ideas to improve the performance are: 
 - limit the search window to the left and right, especially in the near of the horizon
