@@ -182,7 +182,9 @@ Finally the founded cars are labeled and all boxes are combined into one box usi
 
 Ultimately I searched on 4 scales using YCrCb 1-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided best results.
 
-Here are the finaresults for the test images:  
+Another thing was to find an optimzie heatmap threshold. A value too high would miss the car, too low would result in false positives. I tried the values 1,10,30,50 and finally choosed 10.
+
+Here are the final results for the test images with heat_threshold=10:  
 ![testimages](output_images/processed_testimages.jpg) 
 
 ---
