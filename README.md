@@ -157,12 +157,16 @@ we search for the cars. Before the sliding window search is applied, the feature
 
 #### 2. Heatmap
 Next we generate a heatmap by counting the pixels wihtin overlapping windows.
+
 `heatmap_img = add_heat(heatmap_img, rectangles)`
+
 ![pipeline_heatmap](output_images/pipeline_heatmap.jpg)
 
 #### 3. Heatmap threshold
 To prevent false positives we define a threshold to ignore weak signals.
+
 ` heatmap_img = apply_threshold(heatmap_img, heat_threshold)`
+
 ![pipeline_heatmap_threshold](output_images/pipeline_heatmap_threshold.jpg)
 
 #### 4. Labeled boxes
