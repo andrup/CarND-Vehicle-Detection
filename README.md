@@ -70,7 +70,7 @@ Here is an explanation what the parameters mean: (*picture source: lesson 20*)
 
 ![HOG features](output_images/hog_features.jpg)
 
-I got the highest accuracy in training the classifier wiht the YCrCb colorspace.Y is the luminance component and CB and CR are the blue-difference and red-difference chroma components. The light intensity is nonlinearly encoded based on gamma corrected RGB primaries.  ( [Wikipedia](https://en.wikipedia.org/wiki/YCbCr#YCbCr) )
+I got the highest accuracy in training the classifier with the YCrCb colorspace. Y is the luminance component and CB and CR are the blue-difference and red-difference chroma components. The light intensity is nonlinearly encoded based on gamma corrected RGB primaries.  ( [Wikipedia](https://en.wikipedia.org/wiki/YCbCr#YCbCr) )
 
 Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
 
@@ -81,14 +81,14 @@ Here is an example using the `YCrCb` color space and HOG parameters of `orientat
 In the pipeline all feature extraction methods are combined. 
 ![normalized features](output_images/extract_features.jpg)
 
-Because the intensity is different, it has to be normalized.
+Because the intensity is different, the result has to be normalized.
 ![normalized features](output_images/extract_features_normalized.jpg)
 
 
 #### Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM by first extracting the features with the function call `extract_features_from_dataset()` for all car and non-car images are extracted ( HOG, color, sapitalliy binned).
-Next I used the `create_traindataset()` function to split the into training and test data.
+I trained a linear Support Vector Machine (SVM) by first extracting the features with the function call `extract_features_from_dataset()` for all car and non-car images are extracted ( HOG, color, spatialliy binned).
+Next I used the `create_traindataset()` function to split the available data into training and test data.
 Then the `fit_SVC()`function passes all the data into the Scikit function to generate the classifier.
 
 
@@ -127,8 +127,8 @@ def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, ce
 ...
 ```
 
-Because cars cannot drive in the sky, the search is limited to the horizon at y=400 to the bottom (y=720) and x left=0 to right=1280 px. 
-I decided to search in 4 regions with different scling factors. With left the detection was not good enough, more windows need more computations.
+Because cars cannot drive in the sky, the search is limited to the horizon at y=400, to the bottom (y=720) and x to left=0 and right=1280 px. 
+I decided to search in 4 regions with different scaling factors. With less than 4 regions the detection was not good enough, more windows need more computations.
 
 I used the following windows and scaling factors:
 ```python
@@ -178,11 +178,11 @@ Finally the founded cars are labeled and all boxes are combined into one box usi
 ![pipeline_fipipeline_labeled_boxesndcars](output_images/pipeline_labeled_boxes.jpg)
 
 
-What did you do to optimize the performance of your classifier?
+#### What did you do to optimize the performance of your classifier?
 
 Ultimately I searched on 4 scales using YCrCb 1-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided best results.
 
-Here are the results for the test images:  
+Here are the finaresults for the test images:  
 ![testimages](output_images/processed_testimages.jpg) 
 
 ---
@@ -190,7 +190,7 @@ Here are the results for the test images:
 ### Video Implementation
 
 Computing the video is a bit more than processing the images frame per frame. 
-To smoothen the detected boxes, the position of the boxes in the last `10` frames is averaged. Therefore a class `Car_Detector()` has been created to store the date of the last 10 frames.
+To smoothen the detected boxes, the position of the boxes in the last `10` frames is averaged. Therefore a class `Car_Detector()` has been created to store the data of the last 10 frames.
 
 #### Here's a [link to my video result](./project_video_output_V2.mp4)
 
