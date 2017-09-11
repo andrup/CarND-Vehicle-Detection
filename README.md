@@ -190,7 +190,7 @@ Here are the results for the test images:
 ### Video Implementation
 
 Computing the video is a bit more than processing the images frame per frame. 
-To smoothen the detected boxes, the position of the boxes in the last `30` frames is averaged. Therefore a class `Car_Detector()`has been created to store the date of the last 30 frames.
+To smoothen the detected boxes, the position of the boxes in the last `10` frames is averaged. Therefore a class `Car_Detector()` has been created to store the date of the last 10 frames.
 
 #### Here's a [link to my video result](./project_video_output_V2.mp4)
 
@@ -204,10 +204,10 @@ Much time was needed to find out the right parameters. Not only for feature extr
 
 The pipeline will detect also cars in oncoming traffic. To prevent this, the window search could use a left margin to spare out cars that are too far left.
 
-### Performance Issues:
+#### Performance Issues:
 The car finding takes too long for a real time application. It took around 1 h to calculate a video of 50 seconds.
 Ideas to improve the performance are: 
 - limit the search window to the left and right, especially in the near of the horizon
 - Make use of [Scikit PCA](http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html) PCA feature compression
-- Try other specialized algorithms like [YOLO](https://pjreddie.com/darknet/yolo/) neuronal network. But CNNs are another approach to this detection problem.
+- Try other specialized methods like [YOLO](https://pjreddie.com/darknet/yolo/) neuronal network. But CNNs are another approach to this detection problem.
 
