@@ -60,9 +60,13 @@ def get_hog_features(img, orient, pix_per_cell, cell_per_block, vis=False, featu
 
 I tried various combinations of parameters and found one possible optimum with the default of the lessons:
 ```python
-orient = 9   
-pix_per_cell = 8  
-cell_per_block = 2
+color_space    = 'YCrCb'    # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
+orient         = 9          # HOG orientations
+pix_per_cell   = 8          # HOG pixel per cell
+cell_per_block = 2          # HOG cells per block
+hog_channel    = "ALL"      # 0, 1, 2, or "ALL"
+spatial_size   = (32, 32)   # Spatial binning dimensions
+hist_bins      = 32         # Number of histogram bins
 ```
 Here is an explanation what the parameters mean: (*picture source: lesson 20*)
 ![HOG Visualisation](output_images/hog-visualization.jpg)
@@ -89,7 +93,7 @@ Because the intensity is different, the result has to be normalized.
 
 I trained a linear Support Vector Machine (SVM) by first extracting the features with the function call `extract_features_from_dataset()` for all car and non-car images are extracted ( HOG, color, spatialliy binned).
 Next I used the `create_traindataset()` function to split the available data into training and test data.
-Then the `fit_SVC()`function passes all the data into the Scikit function to generate the classifier.
+To reduce the amount of data I compressed the features by makinge use of [Scikit PCA](http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html) PCA feature compression. Then the `fit_SVC()`function passes all the pca compressed data into the Scikit function to generate the classifier.
 
 
 `X_train, X_test, y_train, y_test = train_test_split(scaled_X, y, test_size=0.2, random_state=rand_state)`
@@ -104,11 +108,11 @@ Then the `fit_SVC()`function passes all the data into the Scikit function to gen
                                        hog_channel=hog_channel)
     
     X_scaler, X_train, X_test, y_train, y_test = create_traindataset(car_features, notcar_features)
-    svc = LinearSVC()    
     
-    svc, accuracy, time_fit, time_prediction = fit_SVC(X_train, X_test, y_train, y_test)
-     
-	svc.fit(X_train, y_train)
+    pca, X_train_pca, X_test_pca = fit_PCA(X_train, X_test, y_train, y_test, n_components=150)    
+    
+    svc = LinearSVC()
+	svc.fit(X_train_pca, y_train_pca)
 ```
 
 I checked the score of the SVC with
@@ -182,17 +186,26 @@ Finally the founded cars are labeled and all boxes are combined into one box usi
 
 Ultimately I searched on 4 scales using YCrCb 1-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided best results.
 
-Another thing was to find an optimzie heatmap threshold. A value too high would miss the car, too low would result in false positives. I tried the values 1,10,30,50 and finally choosed 10.
+Another thing was to find an optimzie heatmap threshold. A value too high would miss the car, too low would result in false positives. I tried the values 1,3,10,30,50 and finally choosed 3.
 
-Here are the final results for the test images with heat_threshold=10:  
+Here are the final results for the test images with heat_threshold=3:  
 ![testimages](output_images/processed_testimages.jpg) 
 
 ---
 
 ### Video Implementation
 
-Computing the video is a bit more than processing the images frame per frame. 
-To smoothen the detected boxes, the position of the boxes in the last `10` frames is averaged. Therefore a class `Car_Detector()` has been created to store the data of the last 10 frames.
+Computing the video needs a bit more effort than just processing the images frame per frame. 
+To smoothen the boundaries of the detected cars in the video, the heatmaps of the last `5` frames are stored and averaged. Therefore I used 
+the  `deque` function.
+
+```python
+from collections import deque
+history = deque(maxlen = 5)
+
+heatmap_img = add_heat(heatmap_img, rectangles)
+history.append_heatmap(heatmap_img)
+```
 
 #### Here's a [link to my video result](./project_video_output_V2.mp4)
 
@@ -210,6 +223,5 @@ The pipeline will detect also cars in oncoming traffic. To prevent this, the win
 The car finding takes too long for a real time application. It took around 1 h to calculate a video of 50 seconds.
 Ideas to improve the performance are: 
 - limit the search window to the left and right, especially in the near of the horizon
-- Make use of [Scikit PCA](http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html) PCA feature compression
 - Try other specialized methods like [YOLO](https://pjreddie.com/darknet/yolo/) neuronal network. But CNNs are another approach to this detection problem.
 
