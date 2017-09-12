@@ -196,12 +196,12 @@ Here are the final results for the test images with heat_threshold=3:
 ### Video Implementation
 
 Computing the video needs a bit more effort than just processing the images frame per frame. 
-To smoothen the boundaries of the detected cars in the video, the heatmaps of the last `5` frames are stored and averaged. Therefore I used 
+To smoothen the boundaries of the detected cars in the video, the heatmaps of the last `10` frames are stored and averaged. Therefore I used 
 the  `deque` function.
 
 ```python
 from collections import deque
-history = deque(maxlen = 5)
+history = deque(maxlen = 10)
 
 heatmap_img = add_heat(heatmap_img, rectangles)
 history.append_heatmap(heatmap_img)
