@@ -56,7 +56,7 @@ def get_hog_features(img, orient, pix_per_cell, cell_per_block, vis=False, featu
 ...
 ```
 
-
+In the final implementation I decided to use only one hog_channel = 0 because it generated too much false positives. With 3 channels and a higher treshold for heatmaps I couldn't detect the cars well.
 
 I tried various combinations of parameters and found one possible optimum with the default of the lessons:
 ```python
@@ -64,7 +64,7 @@ color_space    = 'YCrCb'    # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
 orient         = 9          # HOG orientations
 pix_per_cell   = 8          # HOG pixel per cell
 cell_per_block = 2          # HOG cells per block
-hog_channel    = "ALL"      # 0, 1, 2, or "ALL"
+hog_channel    = 0          # 0, 1, 2, or "ALL"
 spatial_size   = (32, 32)   # Spatial binning dimensions
 hist_bins      = 32         # Number of histogram bins
 ```
